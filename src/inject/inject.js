@@ -14,6 +14,10 @@
 
 chrome.extension.onMessage.addListener(
   function(request, sender, sendResponse) {
+    if (!request.authed) {
+      alert('请先登陆');
+      return;
+    }
     var sel = window.getSelection();
     var sentence = null
     var start = -1;

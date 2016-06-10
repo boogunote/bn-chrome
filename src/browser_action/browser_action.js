@@ -7,7 +7,7 @@ document.getElementById('login').onclick = function() {
     username: username,
     password: password
   }, function(response) {
-
+    alert('成功');
   })
 }
 

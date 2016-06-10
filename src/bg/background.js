@@ -6,7 +6,6 @@
 
 
 var dataRef = null;
-var authData = null;
 var itemData = null;
 var itemList = [];
 
@@ -27,7 +26,6 @@ chrome.extension.onMessage.addListener(
           }
         } else {
           console.log("Authenticated successfully with payload:", _authData);
-          authData = _authData;
           initItemList();
         }
       });
@@ -52,11 +50,11 @@ chrome.extension.onMessage.addListener(
               var _data = null
               if (null != item) {
                 item.wordList.push(request.data.wordList[0])
-                dataRef.child(authData.uid).child('/bnword/items/').child(item.key).set(item, function(result) {
+                dataRef.child(dataRef.getAuth().uid).child('/bnword/items/').child(item.key).set(item, function(result) {
                   console.log(result)
                 });
               } else {
-                dataRef.child(authData.uid).child('/bnword/items/').push(request.data, function(result) {
+                dataRef.child(dataRef.getAuth().uid).child('/bnword/items/').push(request.data, function(result) {
                   console.log(result)
                 });
               }
@@ -73,7 +71,13 @@ chrome.extension.onMessage.addListener(
   });
 
 var clickHandler = function(e, tab) {
-  chrome.tabs.sendMessage(tab.id, {word: e.selectionText});
+  if (!dataRef.getAuth()) {
+    chrome.tabs.sendMessage(tab.id, {authed: false});
+  } else {
+    chrome.tabs.sendMessage(tab.id, {
+      authed: true,
+      word: e.selectionText});
+  }
 };
 
 chrome.contextMenus.create({
@@ -164,7 +168,7 @@ function translateXML(xmlnode){
 }
 
 function initItemList() {
-  dataRef.child(authData.uid).child('/bnword/items/')
+  dataRef.child(dataRef.getAuth().uid).child('/bnword/items/')
       .orderByChild("timestamp")
       .endAt(new Date('3000/01/01').getTime()) // NOTICE: displayed items are reversed
       .limitToLast(10)
@@ -198,7 +202,7 @@ function loadScript(url, callback){
 loadScript("js/wilddog.js", function() {
   dataRef = new Wilddog('https://bn.wilddogio.com/');
 
-  if (!!authData) {
+  if (!!dataRef.getAuth()) {
     initItemList();
   }
 });
