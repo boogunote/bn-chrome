@@ -49,6 +49,7 @@ chrome.extension.onMessage.addListener(
 
               var _data = null
               if (null != item) {
+                if (!item.wordList) item.wordList = [];
                 item.wordList.push(request.data.wordList[0])
                 dataRef.child(dataRef.getAuth().uid).child('/bnword/items/').child(item.key).set(item, function(result) {
                   console.log(result)
@@ -74,9 +75,20 @@ var clickHandler = function(e, tab) {
   if (!dataRef.getAuth()) {
     chrome.tabs.sendMessage(tab.id, {authed: false});
   } else {
-    chrome.tabs.sendMessage(tab.id, {
-      authed: true,
-      word: e.selectionText});
+    if (tab.url.indexOf('chrome-extension://') == 0) {
+      dataRef.child(dataRef.getAuth().uid).child('/bnword/items/').push({
+        sentence: e.selectionText.trim(),
+        timestamp: Wilddog.ServerValue.TIMESTAMP,
+        title: tab.title,
+        type: 'sentence'
+      }, function(result) {
+        console.log(result)
+      });
+    } else {
+      chrome.tabs.sendMessage(tab.id, {
+        authed: true,
+        word: e.selectionText.trim()});
+    }
   }
 };
 
