@@ -38,7 +38,7 @@ chrome.extension.onMessage.addListener(
             var dataText = translateXML(xhr.responseXML);
             if(dataText != null){
               request.data.timestamp = Wilddog.ServerValue.TIMESTAMP;
-              request.data.wordList[0].comment = dataText.strpho + ' ' + dataText.basetrans;
+              request.data.wordList[0].comment = dataText.strpho + ' ' + dataText.basetrans + ' ' + dataText.webtrans;
               var item = null;
               for(var i in itemList) {
                 if (-1 != itemList[i].sentence.indexOf(request.data.wordList[0].word)) {
