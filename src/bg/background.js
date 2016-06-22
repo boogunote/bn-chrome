@@ -92,10 +92,31 @@ var clickHandler = function(e, tab) {
   }
 };
 
+var readingNoteHandler = function(e, tab) {
+  if (!dataRef.getAuth()) {
+    chrome.tabs.sendMessage(tab.id, {authed: false});
+  } else {
+    dataRef.child(dataRef.getAuth().uid).child('/reading_note/items/').push({
+      note: !!e.selectionText ? e.selectionText.trim() : '',
+      timestamp: Wilddog.ServerValue.TIMESTAMP,
+      title: tab.title,
+    }, function(result) {
+      console.log(result)
+    });
+  }
+};
+
 chrome.contextMenus.create({
-    "title": "Buzz This",
+    "title": "Boogu Sentence",
     "contexts": ["selection"],
     "onclick" : clickHandler
+  });
+
+chrome.contextMenus.create(
+   {
+    "title": "Boogu Reading Note",
+    "contexts": ["page"],
+    "onclick" : readingNoteHandler
   });
 
 function translateXML(xmlnode){
