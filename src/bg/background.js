@@ -100,6 +100,7 @@ var readingNoteHandler = function(e, tab) {
       note: !!e.selectionText ? e.selectionText.trim() : '',
       timestamp: Wilddog.ServerValue.TIMESTAMP,
       title: tab.title,
+      url: tab.url
     }, function(result) {
       console.log(result)
     });
